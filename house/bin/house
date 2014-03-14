@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
+require 'yaml'
+
 class HouseRhyme
-  def say
-    stanzas.say
+  def say(preamble, lines)
+    stanzas.say(preamble, lines)
   end
 
   private
@@ -15,38 +17,26 @@ class Stanzas
   attr_accessor :said
 
   def initialize(said=String.new)
-    self.said = said
   end
 
-  def say
-    collection.each do |stanza|
+  def say(preamble, lines)
+    lines.each do |stanza|
       StanzaPresenter.new(preamble,stanza_builder(stanza)).say
     end
   end
 
   private
 
-  def collection
-    ['house that Jack built.',
-     'malt that lay in',
-     'rat that ate',
-     'cat that killed',
-     'dog that worried',
-     'cow with the crumpled horn that tossed',
-     'maiden all forlorn that milked',
-     'man all tattered and torn that kissed',
-     'priest all shaven and shorn that married',
-     'rooster that crowed in the morn that woke',
-     'farmer sowing his corn that kept',
-     'horse and the hound and the horn that belonged to']
-  end
-
-  def preamble
-    Preamble.new
-  end
-
   def stanza_builder(stanza_part)
-    self.said = Stanza.new(stanza_part).say + self.said
+    self.said = Stanza.new(stanza_part).say + said
+  end
+
+  def said
+    if @said
+      ' ' + @said
+    else
+      @said = "."
+    end
   end
 end
 
@@ -58,7 +48,7 @@ class Stanza
   end
 
   def say
-    linking_article.to_s + ' ' + stanza_part + ' '
+    linking_article.to_s + ' ' + stanza_part.actor + ' that ' + stanza_part.action
   end
 end
 
@@ -100,4 +90,32 @@ class Preamble
   alias_method :to_s, :to_str
 end
 
-HouseRhyme.new.say
+class Lines
+  attr_reader :collection
+  def initialize(name)
+    @collection = []
+    YAML::load(File.open("../../data/#{name}.yml")).each do |line|
+      @collection << Line.new(line)
+    end
+  end
+
+  def each(&block)
+    collection.each(&block)
+  end
+
+  def shuffle
+    collection.shuffle
+  end
+end
+
+class Line
+  attr_accessor :actor, :action
+  def initialize(d)
+    self.actor = d[:actor]
+    self.action = d[:action]
+  end
+end
+
+lines = Lines.new('jack_built')
+#HouseRhyme.new.say(Preamble.new, lines)
+HouseRhyme.new.say(Preamble.new, lines.shuffle)
