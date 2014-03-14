@@ -41,6 +41,8 @@ class Stanzas
     end
   end
 
+  private
+
   def preamble
     print "This is"
   end
@@ -50,7 +52,18 @@ class Stanzas
   end
 
   def stanza_builder(stanza_part)
-    self.said = " " + 'the ' + stanza_part.to_s + self.said
+    self.said = Stanza.new(stanza_part).say + self.said
+  end
+end
+
+class Stanza
+  attr_accessor :stanza_part
+  def initialize(stanza_part)
+    self.stanza_part = stanza_part
+  end
+
+  def say
+    " " + 'the ' + stanza_part
   end
 end
 
