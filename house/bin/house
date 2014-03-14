@@ -93,20 +93,21 @@ end
 class Lines
   attr_reader :collection, :actions, :actors
   def initialize(actions, actors)
-    @actions = actions
-    @actors = actors
-    merge_actors_and_actions
+    merge_actors_and_actions(actors, actions)
   end
 
   def each(&block)
     collection.each(&block)
   end
 
-  def merge_actors_and_actions
-    @collection = []
-    @actors.each_with_index do |actor, index|
-      @collection << Line.new(actor, @actions[index])
+  def merge_actors_and_actions(actors, actions)
+    actors.each_with_index do |actor, index|
+      collection << Line.new(actor, actions[index])
     end
+  end
+
+  def collection
+    @collection ||= []
   end
 end
 
@@ -136,6 +137,11 @@ class YamlCollection
     @collection = @collection.shuffle
     self
   end
+
+  def end_with(element)
+    @collection.delete(element)
+    @collection.unshift(element)
+  end
 end
 
 class Actors < YamlCollection; end
@@ -144,6 +150,9 @@ class Actions < YamlCollection; end
 
 actors = Actors.new('jack_built')
 actions = Actions.new('jack_built')
+#actors = actors.shuffle
+#actions = actions.shuffle
+#actors.end_with('house')
+#actions.end_with('Jack built')
 lines = Lines.new(actions, actors)
-#lines = Lines.new(actions.shuffle, actors.shuffle)
 HouseRhyme.new.say(Preamble.new, lines)
