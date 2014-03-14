@@ -91,31 +91,59 @@ class Preamble
 end
 
 class Lines
-  attr_reader :collection
-  def initialize(name)
-    @collection = []
-    YAML::load(File.open("../../data/#{name}.yml")).each do |line|
-      @collection << Line.new(line)
-    end
+  attr_reader :collection, :actions, :actors
+  def initialize(actions, actors)
+    @actions = actions
+    @actors = actors
+    merge_actors_and_actions
   end
 
   def each(&block)
     collection.each(&block)
   end
 
-  def shuffle
-    collection.shuffle
+  def merge_actors_and_actions
+    @collection = []
+    @actors.each_with_index do |actor, index|
+      @collection << Line.new(actor, @actions[index])
+    end
   end
 end
 
 class Line
   attr_accessor :actor, :action
-  def initialize(d)
-    self.actor = d[:actor]
-    self.action = d[:action]
+  def initialize(actor, action)
+    self.actor = actor
+    self.action = action
   end
 end
 
-lines = Lines.new('jack_built')
-#HouseRhyme.new.say(Preamble.new, lines)
-HouseRhyme.new.say(Preamble.new, lines.shuffle)
+require 'forwardable'
+
+class YamlCollection
+  extend Forwardable
+
+  def_delegators :@collection, :each, :[], :each_with_index
+
+  def initialize(name)
+    @collection = []
+    YAML::load(File.open("../../data/#{self.class.to_s.downcase}/#{name}.yml")).each do |line|
+      @collection << line
+    end
+  end
+
+  def shuffle
+    @collection = @collection.shuffle
+    self
+  end
+end
+
+class Actors < YamlCollection; end
+
+class Actions < YamlCollection; end
+
+actors = Actors.new('jack_built')
+actions = Actions.new('jack_built')
+lines = Lines.new(actions, actors)
+#lines = Lines.new(actions.shuffle, actors.shuffle)
+HouseRhyme.new.say(Preamble.new, lines)
