@@ -1,14 +1,7 @@
 #!/usr/bin/env ruby
 class HouseRhyme
-  def initialize
-    @total_rhyme = ""
-  end
-
   def say
-    stanzas.each do |stanza|
-      puts "#{preamble}#{rhyme_builder(stanza)}"
-      pause
-    end
+    stanzas.say
   end
 
   private
@@ -16,21 +9,15 @@ class HouseRhyme
   def stanzas
     Stanzas.new
   end
-
-  def preamble
-    "This is"
-  end
-
-  def pause
-    puts ""
-  end
-
-  def rhyme_builder(rhyme_part)
-    @total_rhyme = " " + 'the ' + rhyme_part + @total_rhyme
-  end
 end
 
 class Stanzas
+  attr_accessor :said
+
+  def initialize(said=String.new)
+    self.said = said
+  end
+
   def collection
     ['house that Jack built.',
      'malt that lay in',
@@ -46,8 +33,25 @@ class Stanzas
      'horse and the hound and the horn that belonged to']
   end
 
-  def each(&block)
-    collection.each(&block)
+  def say
+    collection.each do |stanza|
+      preamble
+      puts stanza_builder(stanza)
+      pause
+    end
+  end
+
+  def preamble
+    print "This is"
+  end
+
+  def pause
+    puts ""
+  end
+
+  def stanza_builder(stanza_part)
+    self.said = " " + 'the ' + stanza_part.to_s + self.said
   end
 end
+
 HouseRhyme.new.say
