@@ -120,14 +120,20 @@ class Line
   end
 end
 
-class YamlCollection
+class YamlSource
+  def self.open(directory,name)
+    YAML::load(File.open("./data/#{directory}/#{name}.yml"))
+  end
+end
+
+class SongElements
   extend Forwardable
   attr_accessor :collection
 
   def_delegators :collection, :each, :[], :each_with_index
 
-  def initialize(name)
-    YAML::load(File.open("../../data/#{self.class.to_s.downcase}/#{name}.yml")).each do |line|
+  def initialize(name, source=YamlSource)
+    source.open(self.class.to_s.downcase, name).each do |line|
       collection << line
     end
   end
@@ -136,26 +142,26 @@ class YamlCollection
     @collection ||= []
   end
 
-  def shuffle
-    self.collection = collection.shuffle
+  def shuffle!
+    collection.shuffle!
     self
   end
 
-  def end_with(element)
+  def begin_with(element)
     collection.delete(element)
     collection.unshift(element)
   end
 end
 
-class Actors < YamlCollection; end
+class Actors < SongElements; end
 
-class Actions < YamlCollection; end
+class Actions < SongElements; end
 
 actors = Actors.new('jack_built')
 actions = Actions.new('jack_built')
-#actors = actors.shuffle
-#actions = actions.shuffle
-#actors.end_with('house')
-#actions.end_with('Jack built')
+actors = actors.shuffle!
+actions = actions.shuffle!
+actors.begin_with('house')
+actions.begin_with('Jack built')
 lines = Lines.new(actions, actors)
 HouseRhyme.new.say(Preamble.new, lines)
