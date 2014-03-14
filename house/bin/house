@@ -19,6 +19,7 @@ class Stanzas
   attr_accessor :said
 
   def initialize(said=String.new)
+    self.said = said
   end
 
   def say(preamble, lines)
@@ -34,11 +35,7 @@ class Stanzas
   end
 
   def said
-    if @said
-      ' ' + @said
-    else
-      @said = "."
-    end
+    ' ' + @said
   end
 end
 
@@ -70,7 +67,7 @@ end
 
 class StdoutOutput
   def line(*parts)
-    puts parts.join(' ').strip
+    puts parts.join(' ').strip + "."
   end
 
   def pause
