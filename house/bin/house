@@ -5,6 +5,7 @@ require 'forwardable'
 class HouseRhyme
   def say(preamble, lines)
     stanzas.say(preamble, lines)
+    nil
   end
 
   private
