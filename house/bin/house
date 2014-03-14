@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'yaml'
+require 'forwardable'
 
 class HouseRhyme
   def say(preamble, lines)
@@ -119,28 +120,30 @@ class Line
   end
 end
 
-require 'forwardable'
-
 class YamlCollection
   extend Forwardable
+  attr_accessor :collection
 
-  def_delegators :@collection, :each, :[], :each_with_index
+  def_delegators :collection, :each, :[], :each_with_index
 
   def initialize(name)
-    @collection = []
     YAML::load(File.open("../../data/#{self.class.to_s.downcase}/#{name}.yml")).each do |line|
-      @collection << line
+      collection << line
     end
   end
 
+  def collection
+    @collection ||= []
+  end
+
   def shuffle
-    @collection = @collection.shuffle
+    self.collection = collection.shuffle
     self
   end
 
   def end_with(element)
-    @collection.delete(element)
-    @collection.unshift(element)
+    collection.delete(element)
+    collection.unshift(element)
   end
 end
 
