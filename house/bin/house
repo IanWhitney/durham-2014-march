@@ -18,6 +18,16 @@ class Stanzas
     self.said = said
   end
 
+  def say
+    collection.each do |stanza|
+      print preamble
+      puts stanza_builder(stanza)
+      puts pause
+    end
+  end
+
+  private
+
   def collection
     ['house that Jack built.',
      'malt that lay in',
@@ -33,22 +43,12 @@ class Stanzas
      'horse and the hound and the horn that belonged to']
   end
 
-  def say
-    collection.each do |stanza|
-      preamble
-      puts stanza_builder(stanza)
-      pause
-    end
-  end
-
-  private
-
   def preamble
-    print "This is"
+    Preamble.new
   end
 
   def pause
-    puts ""
+    #noop
   end
 
   def stanza_builder(stanza_part)
@@ -57,14 +57,29 @@ class Stanzas
 end
 
 class Stanza
-  attr_accessor :stanza_part
-  def initialize(stanza_part)
+  attr_accessor :stanza_part, :linking_article
+  def initialize(stanza_part, linking_article=ArticleThe.new)
     self.stanza_part = stanza_part
+    self.linking_article = linking_article
   end
 
   def say
-    " " + 'the ' + stanza_part
+    ' ' + linking_article + ' ' + stanza_part
   end
+end
+
+class ArticleThe
+  def to_str
+    'the'
+  end
+  alias_method :to_s, :to_str
+end
+
+class Preamble
+  def to_str
+    'This is'
+  end
+  alias_method :to_s, :to_str
 end
 
 HouseRhyme.new.say
