@@ -20,9 +20,7 @@ class Stanzas
 
   def say
     collection.each do |stanza|
-      print preamble
-      puts stanza_builder(stanza)
-      puts pause
+      StanzaPresenter.new(preamble,stanza_builder(stanza)).say
     end
   end
 
@@ -47,10 +45,6 @@ class Stanzas
     Preamble.new
   end
 
-  def pause
-    #noop
-  end
-
   def stanza_builder(stanza_part)
     self.said = Stanza.new(stanza_part).say + self.said
   end
@@ -64,7 +58,31 @@ class Stanza
   end
 
   def say
-    ' ' + linking_article + ' ' + stanza_part
+    linking_article.to_s + ' ' + stanza_part + ' '
+  end
+end
+
+class StanzaPresenter
+  attr_accessor :preamble, :stanza, :output
+  def initialize(preamble, stanza, output=StdoutOutput.new)
+    self.preamble = preamble
+    self.stanza   = stanza
+    self.output   = output
+  end
+
+  def say
+    output.line preamble, stanza
+    output.pause
+  end
+end
+
+class StdoutOutput
+  def line(*parts)
+    puts parts.join(' ').strip
+  end
+
+  def pause
+    puts ""
   end
 end
 
