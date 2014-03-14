@@ -1,3 +1,53 @@
 #!/usr/bin/env ruby
+class HouseRhyme
+  def initialize
+    @total_rhyme = ""
+  end
 
-puts "Hello, World!"
+  def say
+    stanzas.each do |stanza|
+      puts "#{preamble}#{rhyme_builder(stanza)}"
+      pause
+    end
+  end
+
+  private
+
+  def stanzas
+    Stanzas.new
+  end
+
+  def preamble
+    "This is"
+  end
+
+  def pause
+    puts ""
+  end
+
+  def rhyme_builder(rhyme_part)
+    @total_rhyme = " " + 'the ' + rhyme_part + @total_rhyme
+  end
+end
+
+class Stanzas
+  def collection
+    ['house that Jack built.',
+     'malt that lay in',
+     'rat that ate',
+     'cat that killed',
+     'dog that worried',
+     'cow with the crumpled horn that tossed',
+     'maiden all forlorn that milked',
+     'man all tattered and torn that kissed',
+     'priest all shaven and shorn that married',
+     'rooster that crowed in the morn that woke',
+     'farmer sowing his corn that kept',
+     'horse and the hound and the horn that belonged to']
+  end
+
+  def each(&block)
+    collection.each(&block)
+  end
+end
+HouseRhyme.new.say
